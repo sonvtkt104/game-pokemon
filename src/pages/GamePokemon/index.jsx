@@ -4,6 +4,7 @@ import { infoPokemon } from "./data";
 
 const widthMap = 16 // + 2 (Outline)
 const heightMap = 9 // + 2 (Outline)
+const widthSquarePokemon = 50
 
 export default function GamePokemon() {
     const [listPokemon, setListPokemon] = useState([[]]) // [x][y] = infoPokemon
@@ -197,8 +198,7 @@ export default function GamePokemon() {
                 gridTemplateColumns:  `repeat(${widthMap + 2}, 1fr)`,
                 gridTemplateRows: `repeat(${heightMap + 2}, 1fr)`,
                 gap: "1px",
-                height: "100%",
-                width: "100%",
+                width: widthSquarePokemon * (widthMap + 2) + (widthMap - 1) + widthMap * 2
             }}
         >
             {
@@ -206,13 +206,16 @@ export default function GamePokemon() {
                     return col.map((pokemon, y) => {
                         if(listPokemon[x][y]) {
                             return (
-                                <span
+                                <div
                                     style={{
                                         gridColumnStart: x + 1,
                                         gridRowStart: y + 1,
+                                        width: widthSquarePokemon,
+                                        height: widthSquarePokemon,
                                         textAlign: "center",
-                                        border: '1px solid',
-                                        background: pokemonChoose?.x == x && pokemonChoose?.y == y ? 'gray' : 'transparent'
+                                        border: '1px solid transparent',
+                                        opacity: pokemonChoose?.x == x && pokemonChoose?.y == y ? '0.5' : '1',
+                                        position: 'relative',
                                     }} 
                                     onClick={() => {
                                         if(pokemonChoose) {
@@ -230,8 +233,15 @@ export default function GamePokemon() {
                                         }
                                     }}
                                 >
-                                    {pokemon?.value}
-                                </span>
+                                    <img src={pokemon.image} alt="pokemon"  
+                                        style={{
+                                            position: 'absolute',
+                                            inset: 0,
+                                            width: '100%',
+                                            height: '100%',
+                                        }}
+                                    />
+                                </div>
                             )
                         } else return ''
                     })
