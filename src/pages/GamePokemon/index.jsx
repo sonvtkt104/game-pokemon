@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import './css/index.css';
 import { infoPokemon } from "./data";
 
@@ -7,7 +7,12 @@ const heightMap = 9 // + 2 (Outline)
 
 export default function GamePokemon() {
     const [listPokemon, setListPokemon] = useState([[]]) // [x][y] = infoPokemon
-    
+    const [pokemonChoose, setPokemonChoose] = useState(null) // {...pokemon, x, y}
+
+    console.log({
+        listPokemon,
+        pokemonChoose
+    })
 
     useEffect(() => {
         let arr = []
@@ -45,9 +50,145 @@ export default function GamePokemon() {
             }
         }
 
-        console.log('listPokemon', arr)
         setListPokemon(arr)
     }, [])
+
+    const handleAfterCheck = useCallback((resultCheck, pokemon1, pokemon2) => {
+        if(resultCheck) {
+            let arr = JSON.parse(JSON.stringify(listPokemon))
+            arr[pokemon1.x][pokemon1.y] = null
+            arr[pokemon2.x][pokemon2.y] = null
+            setListPokemon(arr)
+            setPokemonChoose(null)
+        } else {
+            setPokemonChoose(null)
+        }
+    }, [listPokemon])
+
+    const checkWithLine = useCallback((pokemon1, pokemon2) => { // {..., x, y}
+        let bigger, smaller
+        let check = true;
+        if(pokemon1.x == pokemon2.x) {
+            if(pokemon1.y > pokemon2.y) {
+                bigger = pokemon1.y
+                smaller = pokemon2.y
+            } else {
+                bigger = pokemon2.y
+                smaller = pokemon1.y
+            }
+            for(let i = smaller + 1; i < bigger; i++) {
+                if(listPokemon[pokemon1.x][i]) {
+                    check = false
+                    break;
+                }
+            }
+            return check
+        } else if(pokemon1.y == pokemon2.y) {
+            if(pokemon1.x > pokemon2.x) {
+                bigger = pokemon1.x
+                smaller = pokemon2.x
+            } else {
+                bigger = pokemon2.x
+                smaller = pokemon1.x
+            }
+            for(let i = smaller + 1; i < bigger; i++) {
+                if(listPokemon[i][pokemon1.y]) {
+                    check = false
+                    break;
+                }
+            }
+            return check
+        } else return false;
+    }, [listPokemon]) 
+
+    const checkWithPathL = useCallback((pokemon1, pokemon2) => { // {..., x, y}
+        if(pokemon1.x == pokemon2.x || pokemon1.y == pokemon2.y) {
+            return checkWithLine(pokemon1, pokemon2)
+        } else {
+            let pokemonCorner1 = listPokemon[pokemon1.x][pokemon2.y]
+            let pokemonCorner2 = listPokemon[pokemon2.x][pokemon1.y]
+            if(!pokemonCorner1 && checkWithLine(pokemon1, {x : pokemon1.x, y: pokemon2.y}) && checkWithLine({x : pokemon1.x, y: pokemon2.y}, pokemon2)) {
+                return true
+            } else {
+                return !pokemonCorner2 && checkWithLine(pokemon1, {x : pokemon2.x, y: pokemon1.y}) && checkWithLine({x : pokemon2.x, y: pokemon1.y}, pokemon2)
+            }
+        }
+    }, [checkWithLine, listPokemon])  
+
+    const handleCheckChoosePokemon = useCallback((pokemon2) => { // {...pokemon, x, y}
+        // check value
+        if(pokemonChoose.value != pokemon2.value) {
+            handleAfterCheck(false)
+            return;
+        }
+
+        // check path
+        // check with line
+        if(pokemonChoose.x == pokemon2.x || pokemonChoose.y == pokemon2.y) {
+            if(checkWithLine(pokemonChoose, pokemon2)) {
+                handleAfterCheck(true, pokemonChoose, pokemon2)
+                return
+            } 
+        } 
+
+        // check path L
+        if(checkWithPathL(pokemonChoose, pokemon2)) {
+            handleAfterCheck(true, pokemonChoose, pokemon2)
+            return
+        }
+
+        // direction above
+        for(let y = pokemonChoose.y - 1; y >= 0; y --) {
+            if(listPokemon[pokemonChoose.x][y]) {
+                break;
+            } else {
+                if(checkWithPathL({x: pokemonChoose.x, y: y}, pokemon2)) {
+                    handleAfterCheck(true, pokemonChoose, pokemon2)
+                    return
+                }
+            }
+        }
+
+        // direction bottom 
+        for(let y = pokemonChoose.y + 1; y < heightMap + 2; y ++) {
+            if(listPokemon[pokemonChoose.x][y]) {
+                break;
+            } else {
+                if(checkWithPathL({x: pokemonChoose.x, y: y}, pokemon2)) {
+                    handleAfterCheck(true, pokemonChoose, pokemon2)
+                    return
+                }
+            }
+        }
+        
+        // direction left
+        for(let x = pokemonChoose.x - 1; x >= 0; x --) {
+            if(listPokemon[x][pokemonChoose.y]) {
+                break;
+            } else {
+                if(checkWithPathL({x: x, y: pokemonChoose.y}, pokemon2)) {
+                    handleAfterCheck(true, pokemonChoose, pokemon2)
+                    return
+                }
+            }
+        }
+
+        // direction right
+        for(let x = pokemonChoose.x + 1; x < widthMap + 2; x ++) {
+            if(listPokemon[x][pokemonChoose.y]) {
+                break;
+            } else {
+                if(checkWithPathL({x: x, y: pokemonChoose.y}, pokemon2)) {
+                    handleAfterCheck(true, pokemonChoose, pokemon2)
+                    return
+                }
+            }
+        }
+
+        // return default
+        handleAfterCheck(false)
+        return
+    }, [pokemonChoose, listPokemon, checkWithLine, handleAfterCheck, checkWithPathL])
 
     return (
         <div
@@ -62,18 +203,38 @@ export default function GamePokemon() {
         >
             {
                 listPokemon?.map((col, x) => {
-                    return col.map((pokemon, y) => (
-                        <span
-                            style={{
-                                gridColumnStart: x + 1,
-                                gridRowStart: y + 1,
-                                textAlign: "center",
-                                border: '1px solid'
-                            }}      
-                        >
-                            {pokemon?.value}
-                        </span>
-                    ))
+                    return col.map((pokemon, y) => {
+                        if(listPokemon[x][y]) {
+                            return (
+                                <span
+                                    style={{
+                                        gridColumnStart: x + 1,
+                                        gridRowStart: y + 1,
+                                        textAlign: "center",
+                                        border: '1px solid',
+                                        background: pokemonChoose?.x == x && pokemonChoose?.y == y ? 'gray' : 'transparent'
+                                    }} 
+                                    onClick={() => {
+                                        if(pokemonChoose) {
+                                            if(JSON.stringify(pokemonChoose) == JSON.stringify({...pokemon, x, y})) {
+                                                setPokemonChoose(null)
+                                            } else {
+                                                handleCheckChoosePokemon({...pokemon, x, y})
+                                            }
+                                        } else {
+                                            setPokemonChoose({
+                                                ...pokemon,
+                                                x : x,
+                                                y : y,
+                                            })
+                                        }
+                                    }}
+                                >
+                                    {pokemon?.value}
+                                </span>
+                            )
+                        } else return ''
+                    })
                 })
             }
         </div>
