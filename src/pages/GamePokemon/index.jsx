@@ -207,15 +207,12 @@ export default function GamePokemon() {
                         if(listPokemon[x][y]) {
                             return (
                                 <div
+                                    className={`item-pokemon ${pokemonChoose?.x == x && pokemonChoose?.y == y ? 'active' : ''}`}
                                     style={{
                                         gridColumnStart: x + 1,
                                         gridRowStart: y + 1,
                                         width: widthSquarePokemon,
                                         height: widthSquarePokemon,
-                                        textAlign: "center",
-                                        border: '1px solid transparent',
-                                        opacity: pokemonChoose?.x == x && pokemonChoose?.y == y ? '0.5' : '1',
-                                        position: 'relative',
                                     }} 
                                     onClick={() => {
                                         if(pokemonChoose) {

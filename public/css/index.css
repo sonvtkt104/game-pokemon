@@ -1,21 +1,89 @@
 body {
-    margin: 0;
-    font-family: 'Poppins' ,sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    color: #38383A;
-  }
-  
-  
-  
-  h1, h2, h3, h4, h5, h6 {
-    margin: 0px;
-    color: #38383A;
-    font-family: Poppins;
-  }
-  p {
-    margin: 0px;
-    font-family: Poppins;
-    color: #38383A;
-  }
+  margin: 0;
+  font-family: 'Poppins', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #38383A;
+}
 
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0px;
+  color: #38383A;
+  font-family: Poppins;
+}
+
+p {
+  margin: 0px;
+  font-family: Poppins;
+  color: #38383A;
+}
+
+:root {
+  /* Primary */
+  --color-primary-red: #E03400;
+  --color-primary-green: #29845A;
+  --color-primary-yellow: #857700;
+  --color-primary-blue: #0087ff6b;
+  --color-primary-black: #38383A;
+
+  /* Secondary */
+  --color-secondary-red: #C72E00;
+  --color-secondary-green: #24754F;
+  --color-secondary-yellow: #7A6E00;
+  --color-secondary-blue: #005BBD;
+  --color-secondary-black: #666666;
+
+  /* Background */
+  --color-background-red: #FFECE5;
+  --color-background-green: #E4F6EE;
+  --color-background-yellow: #FFFDEB;
+  --color-background-blue: #EBF5FF;
+  --color-background-blue-secondary: #F0F9FF;
+  --color-background-black: #F0F0F0;
+
+  --color-background-disabled: #E5E5E5;
+  --color-background-selected: #E6F7FF;
+  --color-background-selected-secondary: #F0F9FF;
+  --color-background-hover: #F5F5F5;
+
+  /* Others setting */
+  --color-text-disabled: #B5B5B5;
+  --color-border-button: #DADFE9;
+  --color-border-input: #DFDFDF;
+  --color-white: #ffffff;
+
+  --color-disabled-bg: #E5E5E5;
+  --color-disabled-subdued-text: #B5B5B5;
+  --color-button-border: #dadfe9;
+  --color-input-border: #ecebed;
+  --color-selected-bg: #e6f7ff;
+  --color-hover-bg: #f5f5f5;
+
+  --bs-border-radius: 4px;
+
+  --bs-gray-100: #f8f9fa;
+  --bs-gray-200: #e9ecef;
+  --bs-gray-300: #dee2e6;
+  --bs-gray-400: #ced4da;
+  --bs-gray-500: #adb5bd;
+  --bs-gray-600: #6c757d;
+  --bs-gray-700: #495057;
+  --bs-gray-800: #343a40;
+  --bs-gray-900: #212529;
+  --bs-primary: #0071E9;
+  --bs-secondary: #666666;
+  --bs-success: #29845A;
+  --bs-info: #0071E9;
+  --bs-warning: #857700;
+  --bs-danger: #E03400;
+  --bs-light: #FFFFFF;
+  --bs-dark: #38383A;
+  --app-color-button-border: #DADFE9;
+}
