@@ -9,6 +9,7 @@ const widthSquarePokemon = 50
 export default function GamePokemon() {
     const [listPokemon, setListPokemon] = useState([[]]) // [x][y] = infoPokemon
     const [pokemonChoose, setPokemonChoose] = useState(null) // {...pokemon, x, y}
+    const [score, setScore] = useState(0)
 
     console.log({
         listPokemon,
@@ -61,6 +62,7 @@ export default function GamePokemon() {
             arr[pokemon2.x][pokemon2.y] = null
             setListPokemon(arr)
             setPokemonChoose(null)
+            setScore(pre => pre + 10)
         } else {
             setPokemonChoose(null)
         }
@@ -191,59 +193,97 @@ export default function GamePokemon() {
         return
     }, [pokemonChoose, listPokemon, checkWithLine, handleAfterCheck, checkWithPathL])
 
-    return (
-        <div
-            style={{
-                display: "grid",
-                gridTemplateColumns:  `repeat(${widthMap + 2}, 1fr)`,
-                gridTemplateRows: `repeat(${heightMap + 2}, 1fr)`,
-                gap: "1px",
-                width: widthSquarePokemon * (widthMap + 2) + (widthMap - 1) + widthMap * 2
-            }}
-        >
-            {
-                listPokemon?.map((col, x) => {
-                    return col.map((pokemon, y) => {
-                        if(listPokemon[x][y]) {
-                            return (
-                                <div
-                                    className={`item-pokemon ${pokemonChoose?.x == x && pokemonChoose?.y == y ? 'active' : ''}`}
-                                    style={{
-                                        gridColumnStart: x + 1,
-                                        gridRowStart: y + 1,
-                                        width: widthSquarePokemon,
-                                        height: widthSquarePokemon,
-                                    }} 
-                                    onClick={() => {
-                                        if(pokemonChoose) {
-                                            if(JSON.stringify(pokemonChoose) == JSON.stringify({...pokemon, x, y})) {
-                                                setPokemonChoose(null)
-                                            } else {
-                                                handleCheckChoosePokemon({...pokemon, x, y})
-                                            }
-                                        } else {
-                                            setPokemonChoose({
-                                                ...pokemon,
-                                                x : x,
-                                                y : y,
-                                            })
-                                        }
-                                    }}
-                                >
-                                    <img src={pokemon.image} alt="pokemon"  
-                                        style={{
-                                            position: 'absolute',
-                                            inset: 0,
-                                            width: '100%',
-                                            height: '100%',
-                                        }}
-                                    />
-                                </div>
-                            )
-                        } else return ''
-                    })
-                })
+    const handleShuffle = useCallback(() => {
+        let arr = []
+        let listPokemonCurrent = JSON.parse(JSON.stringify(listPokemon))
+        listPokemonCurrent?.forEach(colPokemon => {
+            colPokemon?.forEach(pokemon => {
+                if(pokemon) arr.push(pokemon)
+            })
+        })
+
+        // shuffle
+        arr = arr?.sort(() => Math.random() - 0.5)
+
+        let i = 0
+        for(let x = 1; x <= widthMap; x++) {
+            for(let y = 1; y <= heightMap; y++) {
+                if(listPokemonCurrent[x][y]) {
+                    listPokemonCurrent[x][y] = arr[i]
+                    i++
+                }
             }
+        }
+
+        setListPokemon(listPokemonCurrent)
+    }, [listPokemon])
+
+    return (
+        <div>
+            <div
+                style={{
+                    display: "grid",
+                    gridTemplateColumns:  `repeat(${widthMap + 2}, 1fr)`,
+                    gridTemplateRows: `repeat(${heightMap + 2}, 1fr)`,
+                    gap: "1px",
+                    width: widthSquarePokemon * (widthMap + 2) + (widthMap - 1) + widthMap * 2
+                }}
+            >
+                {
+                    listPokemon?.map((col, x) => {
+                        return col.map((pokemon, y) => {
+                            if(listPokemon[x][y]) {
+                                return (
+                                    <div
+                                        className={`item-pokemon ${pokemonChoose?.x == x && pokemonChoose?.y == y ? 'active' : ''}`}
+                                        style={{
+                                            gridColumnStart: x + 1,
+                                            gridRowStart: y + 1,
+                                            width: widthSquarePokemon,
+                                            height: widthSquarePokemon,
+                                        }} 
+                                        onClick={() => {
+                                            if(pokemonChoose) {
+                                                if(JSON.stringify(pokemonChoose) == JSON.stringify({...pokemon, x, y})) {
+                                                    setPokemonChoose(null)
+                                                } else {
+                                                    handleCheckChoosePokemon({...pokemon, x, y})
+                                                }
+                                            } else {
+                                                setPokemonChoose({
+                                                    ...pokemon,
+                                                    x : x,
+                                                    y : y,
+                                                })
+                                            }
+                                        }}
+                                    >
+                                        <img src={pokemon.image} alt="pokemon"  
+                                            style={{
+                                                position: 'absolute',
+                                                inset: 0,
+                                                width: '100%',
+                                                height: '100%',
+                                            }}
+                                        />
+                                    </div>
+                                )
+                            } else return ''
+                        })
+                    })
+                }
+            </div>
+            <div
+                style={{cursor: 'pointer'}}
+                onClick={() => {
+                    handleShuffle()
+                }}
+            >
+                shuffle
+            </div>
+            <div>
+                Score: {score}
+            </div>
         </div>
     )
 }
